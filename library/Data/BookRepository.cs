@@ -44,7 +44,7 @@ public class BookRepository
 
         return books;
     }
-}
+
 
     // CREATE: insert a new book. The database chooses its book_id.
     public async Task AddAsync(Book book)
@@ -59,4 +59,17 @@ public class BookRepository
         command.Parameters.AddWithValue("price", (object?)book.Price ?? DBNull.Value);
 
         await command.ExecuteNonQueryAsync();           // runs SQL that returns no rows
+    }
+}
+
+   // READ: one book, or null when no book has that id.
+    public async Task<Book?> GetByIdAsync(long id)
+    {
+        const string sql = "SELECT book_id, title, category, price FROM lending.book WHERE book_id = @id;";
+
+        await using var command = _dataSource.CreateCommand(sql);
+        command.Parameters.AddWithValue("id", id);      // @id in the SQL receives this value
+
+        await using var reader = await command.ExecuteReaderAsync();
+        return await reader.ReadAsync() ? ReadBook(reader) : null;
     }

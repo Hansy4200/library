@@ -8,21 +8,32 @@ public class BooksController : Controller
 {
     private readonly BookRepository _books;
 
-    // ASP.NET Core hands in the repository, because Program.cs registered it.
     public BooksController(BookRepository books)
     {
         _books = books;
     }
 
-    // GET /Books : the list of books.
     public async Task<IActionResult> Index()
     {
         var books = await _books.GetAllAsync();
         return View(books);
     }
-}
 
-  public IActionResult Create()
+    public IActionResult Create()
     {
         return View(new Book());
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(Book book)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(book);
+        }
+
+        await _books.AddAsync(book);
+        return RedirectToAction(nameof(Index));
+    }
+}
