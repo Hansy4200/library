@@ -12,6 +12,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
 var dataSource = NpgsqlDataSource.Create(connectionString);
 builder.Services.AddSingleton(dataSource);
 builder.Services.AddScoped<BookRepository>();
+builder.Services.AddScoped<MembersRepository>();
 
 var app = builder.Build();
 
