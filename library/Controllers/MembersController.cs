@@ -45,6 +45,7 @@ public class MembersController : Controller
             return View(member);
         }
 
+        await _member.AddAsync(member);
         return RedirectToAction(nameof(Index));
     }
 
