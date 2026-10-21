@@ -1,0 +1,56 @@
+﻿@model library.Models.Note
+
+@{
+    ViewData["Title"] = "Create Note";
+}
+
+<div class="container mt-4">
+    <h2>Create New Note</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label"></label>
+                    <input asp-for="Title" class="form-control"
+                           maxlength="100" placeholder="Enter title" />
+                    <span asp-validation-for="Title"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Body" class="form-label">
+                        Body (Optional)
+                    </label>
+                    <textarea asp-for="Body" class="form-control"
+                              rows="5" placeholder="Write your note"></textarea>
+                    <span asp-validation-for="Body"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CreatedOn" class="form-label">
+                        Created On
+                    </label>
+                    <input asp-for="CreatedOn" type="date"
+                           asp-format="{0:yyyy-MM-dd}"
+                           class="form-control" />
+                    <span asp-validation-for="CreatedOn"
+                          class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-success">Save Note</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

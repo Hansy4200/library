@@ -1,4 +1,4 @@
-﻿@model List<Members>
+@model List<Member>
 @{
     ViewData["Title"] = "Members";
 }
@@ -6,7 +6,7 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
         <h1 class="mb-0">Members</h1>
-        <p class="text-muted mb-0">@Model.Count members in the catalogue</p>
+        <p class="text-muted mb-0">@Model.Count members registered</p>
     </div>
     <a asp-action="Create" class="btn btn-primary">Add a member</a>
 
@@ -16,26 +16,27 @@
     <thead class="table-dark">
         <tr>
             <th class="text-end" style="width:4rem">#</th>
-            <th>Title</th>
-            <th>Category</th>
-            <th class="text-end">Price</th>
+            <th>Full name</th>
+            <th>Email</th>
+            <th>Join date</th>
+            <th>Type</th>
             <th style="width:10rem"></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var book in Model)
+        @foreach (var member in Model)
         {
             <tr>
-                <td class="text-end">@book.MemberId</td>
-                <td>@book.Title</td>
-                <td><span class="badge text-bg-secondary">@(book.Category ?? "—")</span></td>
-                <td class="text-end">@(book.Price?.ToString("N2") ?? "—")</td>
+                <td class="text-end">@member.MemberId</td>
+                <td>@member.FullName</td>
+                <td>@(member.Email ?? "—")</td>
+                <td>@member.JoinDate.ToString("yyyy-MM-dd")</td>
+                <td><span class="badge text-bg-secondary">@member.MemberType</span></td>
                 <td class="text-end">
-                    <a asp-action="Edit" asp-route-id="@book.MemberId" class="btn btn-sm btn-outline-secondary">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@book.MemberId" class="btn btn-sm btn-outline-danger">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@member.MemberId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@member.MemberId" class="btn btn-sm btn-outline-danger">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
-
