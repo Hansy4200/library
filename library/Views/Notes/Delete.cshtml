@@ -1,0 +1,29 @@
+﻿@model library.Models.Note
+
+@{
+    ViewData["Title"] = "Delete Note";
+}
+
+<div class="container mt-4">
+    <h2>Delete Note</h2>
+
+    <div class="alert alert-warning">
+        Are you sure you want to delete this note? This cannot be undone.
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <p><strong>ID:</strong> @Model.NoteId</p>
+            <p><strong>Title:</strong> @Model.Title</p>
+            <p><strong>Body:</strong> @(Model.Body ?? "No body")</p>
+            <p><strong>Created On:</strong> @Model.CreatedOn.ToString("yyyy-MM-dd")</p>
+        </div>
+    </div>
+
+    <form asp-action="Delete" asp-route-id="@Model.NoteId" method="post">
+        @Html.AntiForgeryToken()
+
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

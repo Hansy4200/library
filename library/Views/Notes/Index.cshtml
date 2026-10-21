@@ -1,0 +1,57 @@
+﻿@model IEnumerable<library.Models.Note>
+
+@{
+    ViewData["Title"] = "Library Notes";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Library Notes</h2>
+            <p class="text-muted">Manage your library reminders and notes.</p>
+        </div>
+
+        <a asp-action="Create" class="btn btn-success">+ Add Note</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No notes found.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-success">
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Body</th>
+                        <th>Created On</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var note in Model)
+                    {
+                        <tr>
+                            <td>@note.NoteId</td>
+                            <td>@note.Title</td>
+                            <td>@(string.IsNullOrWhiteSpace(note.Body) ? "No body" : note.Body)</td>
+                            <td>@note.CreatedOn.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <a asp-action="Edit"
+                                   asp-route-id="@note.NoteId"
+                                   class="btn btn-primary btn-sm">Edit</a>
+
+                                <a asp-action="Delete"
+                                   asp-route-id="@note.NoteId"
+                                   class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
