@@ -1,4 +1,4 @@
-
+using Npgsql;
 using library.Data;
 using library.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +31,8 @@ public class MembersController : Controller
         });
     }
 
-    // Save a new member
+
+    // POST /Members/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Member member)
@@ -45,18 +46,20 @@ public class MembersController : Controller
         {
             await _members.AddAsync(member);
         }
-        catch (PostgresException ex)
-            when (ex.SqlState == PostgresErrorCodes.UniqueViolation)
+        catch (PostgresException ex) when (
+            ex.SqlState == PostgresErrorCodes.UniqueViolation)
         {
             ModelState.AddModelError(
-                nameof(Member.Email),
-                "Another member already uses this email.");
+                "Email",
+                "Another member already uses this email."
+            );
 
             return View(member);
         }
 
         return RedirectToAction(nameof(Index));
     }
+
 
     // Display the Edit Member form
     public async Task<IActionResult> Edit(long id)
@@ -71,7 +74,8 @@ public class MembersController : Controller
         return View(member);
     }
 
-    // Update an existing member
+
+    // POST /Members/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Member member)
@@ -85,18 +89,20 @@ public class MembersController : Controller
         {
             await _members.UpdateAsync(member);
         }
-        catch (PostgresException ex)
-            when (ex.SqlState == PostgresErrorCodes.UniqueViolation)
+        catch (PostgresException ex) when (
+            ex.SqlState == PostgresErrorCodes.UniqueViolation)
         {
             ModelState.AddModelError(
-                nameof(Member.Email),
-                "Another member already uses this email.");
+                "Email",
+                "Another member already uses this email."
+            );
 
             return View(member);
         }
 
         return RedirectToAction(nameof(Index));
     }
+
 
     // Display the Delete Member confirmation page
     public async Task<IActionResult> Delete(long id)
@@ -111,7 +117,8 @@ public class MembersController : Controller
         return View(member);
     }
 
-    // Delete a member
+
+    // POST /Members/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(long id)
@@ -120,8 +127,8 @@ public class MembersController : Controller
         {
             await _members.DeleteAsync(id);
         }
-        catch (PostgresException ex)
-            when (ex.SqlState == PostgresErrorCodes.ForeignKeyViolation)
+        catch (PostgresException ex) when (
+            ex.SqlState == PostgresErrorCodes.ForeignKeyViolation)
         {
             var member = await _members.GetByIdAsync(id);
 
@@ -130,9 +137,8 @@ public class MembersController : Controller
                 return NotFound();
             }
 
-            ModelState.AddModelError(
-                string.Empty,
-                "This member still has loans, so they cannot be deleted.");
+            ViewBag.Error =
+                "This member has loans on record, so the database will not delete them.";
 
             return View("Delete", member);
         }
