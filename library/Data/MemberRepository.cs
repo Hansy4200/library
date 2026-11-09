@@ -26,7 +26,7 @@ public class MemberRepository
             MemberType = reader.GetString(4)
         };
     }
-
+    
     // READ: every member, sorted by name.
     public async Task<List<Member>> GetAllAsync()
     {
