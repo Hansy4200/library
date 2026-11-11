@@ -1,12 +1,28 @@
+
+using System.ComponentModel.DataAnnotations;
+
 namespace library.Models;
 
 // One Member object holds one row of lending.member.
 public class Member
 {
-    public long MemberId { get; set; }            // member_id    BIGINT, the primary key
-    public string FullName { get; set; } = "";    // full_name    VARCHAR(80) NOT NULL
-    public string? Email { get; set; }            // email        VARCHAR(120), may be NULL, must be unique
-    public DateOnly JoinDate { get; set; }        // join_date    DATE NOT NULL
-    public string MemberType { get; set; } = "Regular"; // member_type  VARCHAR(10) NOT NULL: Regular, Student or Faculty
+    public long MemberId { get; set; }
+
+    [StringLength(80,
+        ErrorMessage = "The name can be at most 80 characters.")]
+    [RegularExpression(
+        @"^[A-Za-zÑñ .'-]+, [A-Za-zÑñ .'-]+$",
+        ErrorMessage = "Write the name as Lastname, Firstname.")]
+    public string FullName { get; set; } = "";
+
+    [StringLength(120,
+        ErrorMessage = "The email can be at most 120 characters.")]
+    [RegularExpression(
+        @"^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$",
+        ErrorMessage = "Enter an email such as ana@ubaguio.edu.")]
+    public string? Email { get; set; }
+    public DateOnly JoinDate { get; set; }
+    public string MemberType { get; set; } = "";
+    public long OpenLoans { get; set; }
 
 }
