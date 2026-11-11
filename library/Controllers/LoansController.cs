@@ -27,4 +27,33 @@ public class LoansController : Controller
         var loans = await _loans.GetAllAsync();
         return View(loans);
     }
+    private async Task FillDropdownsAsync()
+    {
+        ViewBag.Members = new SelectList(
+            await _members.GetAllAsync(),
+            "MemberId",
+            "FullName");
+
+        ViewBag.Books = new SelectList(
+            await _books.GetAllAsync(),
+            "BookId",
+            "Title");
+    }
+
+    // GET /Loans/Borrow
+    public async Task<IActionResult> Borrow()
+    {
+        await FillDropdownsAsync();
+        return View(new BorrowForm());
+    }
+
+    // POST /Loans/Return/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Return(long id)
+    {
+        await _loans.ReturnAsync(id);
+
+        return RedirectToAction(nameof(Index));
+    }
 }

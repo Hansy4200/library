@@ -58,4 +58,121 @@ public class LoanRepository
 
         return loans;
     }
+
+
+    public async Task<bool> BorrowAsync(
+        long memberId,
+        long bookId,
+        int daysAllowed)
+    {
+        // 1. Open one connection.
+        await using var connection =
+            await _dataSource.OpenConnectionAsync();
+
+        // 2. Start a transaction.
+        await using var transaction =
+            await connection.BeginTransactionAsync();
+
+        // 3. Lock the member row.
+        await using (var lockMember = new NpgsqlCommand(
+            "SELECT member_id FROM lending.member " +
+            "WHERE member_id = @member_id FOR UPDATE;",
+            connection, transaction))
+        {
+            lockMember.Parameters.AddWithValue("member_id", memberId);
+            await lockMember.ExecuteNonQueryAsync();
+        }
+
+        // 4. Count current open loans.
+        long openLoans;
+
+        await using (var count = new NpgsqlCommand(
+            "SELECT COUNT(*) FROM lending.loan " +
+            "WHERE member_id = @member_id AND returned_on IS NULL;",
+            connection, transaction))
+        {
+            count.Parameters.AddWithValue("member_id", memberId);
+
+            openLoans = Convert.ToInt64(
+                await count.ExecuteScalarAsync());
+        }
+
+        // 5. Check the maximum.
+        if (openLoans >= MaxOpenLoans)
+        {
+            // 6. Undo the transaction.
+            await transaction.RollbackAsync();
+
+            // 7. Nothing was borrowed.
+            return false;
+        }
+
+        // 8. Insert the loan.
+        await using (var insert = new NpgsqlCommand(
+            "INSERT INTO lending.loan " +
+            "(member_id, book_id, days_allowed) " +
+            "VALUES (@member_id, @book_id, @days_allowed);",
+            connection, transaction))
+        {
+            insert.Parameters.AddWithValue("member_id", memberId);
+            insert.Parameters.AddWithValue("book_id", bookId);
+            insert.Parameters.AddWithValue("days_allowed", daysAllowed);
+
+            await insert.ExecuteNonQueryAsync();
+        }
+
+        // 9. Save the transaction.
+        await transaction.CommitAsync();
+
+        // 10. Borrowing succeeded.
+        return true;
+    }
+
+
+    public async Task ReturnAsync(long loanId)
+    {
+        // 1. SQL statement.
+        const string sql =
+            "UPDATE lending.loan SET returned_on = CURRENT_DATE " +
+            "WHERE loan_id = @id AND returned_on IS NULL;";
+
+        // 2. Create command.
+        await using var command = _dataSource.CreateCommand(sql);
+
+        // 3. Add loan ID.
+        command.Parameters.AddWithValue("id", loanId);
+
+        // 4. Execute.
+        await command.ExecuteNonQueryAsync();
+    }
+
+    public async Task<List<LoanView>> GetByMemberAsync(long memberId)
+    {
+        const string sql =
+            "SELECT l.loan_id, l.member_id, m.full_name, b.title, " +
+            "l.loaned_on, l.returned_on, l.days_allowed, " +
+            "CASE WHEN l.returned_on IS NOT NULL THEN 'Returned' " +
+            "WHEN l.loaned_on + l.days_allowed < CURRENT_DATE THEN 'Overdue' " +
+            "ELSE 'Out' END " +
+            "FROM lending.loan l " +
+            "JOIN lending.member m ON l.member_id = m.member_id " +
+            "JOIN lending.book b ON l.book_id = b.book_id " +
+            "WHERE l.member_id = @member_id " +
+            "ORDER BY l.loaned_on DESC, l.loan_id DESC;";
+
+        var loans = new List<LoanView>();
+
+        await using var command = _dataSource.CreateCommand(sql);
+
+        command.Parameters.AddWithValue("member_id", memberId);
+
+        await using var reader = await command.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            loans.Add(ReadLoan(reader));
+        }
+
+        return loans;
+    }
 }

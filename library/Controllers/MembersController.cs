@@ -9,10 +9,15 @@ namespace library.Controllers;
 public class MembersController : Controller
 {
     private readonly MemberRepository _members;
+    private readonly LoanRepository _loans;
 
-    public MembersController(MemberRepository members)
+    // ASP.NET Core hands in the repositories.
+    public MembersController(
+        MemberRepository members,
+        LoanRepository loans)
     {
         _members = members;
+        _loans = loans;
     }
 
     // Display all members
@@ -144,5 +149,30 @@ public class MembersController : Controller
         }
 
         return RedirectToAction(nameof(Index));
+    }
+
+
+    // GET /Members/Details/5
+    public async Task<IActionResult> Details(long id)
+    {
+        // 1. Load the member.
+        var member = await _members.GetByIdAsync(id);
+
+        // 2. Check if the member does not exist.
+        if (member == null)
+        {
+            // 3. Return not found.
+            return NotFound();
+        }
+
+        // 4. Put the member and loans together.
+        var details = new MemberDetails
+        {
+            Member = member,
+            Loans = await _loans.GetByMemberAsync(id)
+        };
+
+        // 5. Show the page.
+        return View(details);
     }
 }
