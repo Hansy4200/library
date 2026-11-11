@@ -23,5 +23,6 @@ public class Member
     public string? Email { get; set; }
     public DateOnly JoinDate { get; set; }
     public string MemberType { get; set; } = "";
-   
+    public long OpenLoans { get; set; }
+
 }
