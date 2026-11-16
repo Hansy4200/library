@@ -20,8 +20,10 @@ var dataSource = NpgsqlDataSource.Create(connectionString);
 builder.Services.AddSingleton(dataSource);
 
 // Register repositories
+// Register repositories
 builder.Services.AddScoped<BookRepository>();
-builder.Services.AddScoped<MembersRepository>();
+builder.Services.AddScoped<MemberRepository>();
+builder.Services.AddScoped<LoanRepository>();
 builder.Services.AddScoped<NoteRepository>();
 
 var app = builder.Build();
@@ -34,6 +36,10 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable CSS, JavaScript, and image files
+app.UseStaticFiles();
+
 app.UseRouting();
 app.UseAuthorization();
 

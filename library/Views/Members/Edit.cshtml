@@ -2,42 +2,68 @@
 @{
     ViewData["Title"] = "Edit a member";
 }
- 
-<h1 class="mb-3">Edit a member</h1>
- 
-<form asp-action="Edit" method="post" class="card card-body" style="max-width:36rem">
-    <input type="hidden" asp-for="MemberId" />
- 
-    <div class="mb-3">
-        <label asp-for="FullName" class="form-label"></label>
-        <input asp-for="FullName" class="form-control" />
-        <span asp-validation-for="FullName" class="text-danger"></span>
+
+<div class="book-form-page">
+
+    <div class="book-form-breadcrumb">
+        <a asp-action="Index">Members</a>
+        <span>/</span>
+        <span>Edit a member</span>
     </div>
- 
-    <div class="mb-3">
-        <label asp-for="Email" class="form-label"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
+
+    <div class="book-form-heading">
+        <h1>Edit a member</h1>
+        <p>Update this member's details.</p>
     </div>
- 
-    <div class="mb-3">
-        <label asp-for="JoinDate" class="form-label"></label>
-        <input asp-for="JoinDate" class="form-control" />
-        <span asp-validation-for="JoinDate" class="text-danger"></span>
+
+    <div class="book-form-card">
+        <div class="book-form-card-heading">
+            <div class="book-form-icon">✎</div>
+            <div>
+                <h2>Member details</h2>
+                <p>Name, email, join date, and member type are required.</p>
+            </div>
+        </div>
+
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="MemberId" />
+
+            <div asp-validation-summary="ModelOnly" class="book-validation-summary"></div>
+
+            <div class="book-form-fields">
+                <div class="book-form-group">
+                    <label asp-for="FullName">Full name</label>
+                    <input asp-for="FullName" class="book-form-input" placeholder="Last name, First name" />
+                    <span asp-validation-for="FullName" class="book-validation-message"></span>
+                </div>
+
+                <div class="book-form-group">
+                    <label asp-for="Email">Email</label>
+                    <input asp-for="Email" type="email" class="book-form-input" placeholder="name@ub.edu.ph" />
+                    <span asp-validation-for="Email" class="book-validation-message"></span>
+                </div>
+
+                <div class="book-form-group">
+                    <label asp-for="JoinDate">Join date</label>
+                    <input asp-for="JoinDate" type="date" asp-format="{0:yyyy-MM-dd}" class="book-form-input" />
+                    <span asp-validation-for="JoinDate" class="book-validation-message"></span>
+                </div>
+
+                <div class="book-form-group">
+                    <label asp-for="MemberType">Member type</label>
+                    <select asp-for="MemberType" class="book-form-input">
+                        <option>Faculty</option>
+                        <option>Regular</option>
+                        <option>Student</option>
+                    </select>
+                    <span asp-validation-for="MemberType" class="book-validation-message"></span>
+                </div>
+            </div>
+
+            <div class="book-form-actions">
+                <a asp-action="Index" class="book-cancel-btn">Cancel</a>
+                <button type="submit" class="book-save-btn">Save member</button>
+            </div>
+        </form>
     </div>
- 
-    <div class="mb-3">
-        <label asp-for="MemberType" class="form-label"></label>
-        <select asp-for="MemberType" class="form-select">
-            <option>Regular</option>
-            <option>Student</option>
-            <option>Faculty</option>
-        </select>
-        <span asp-validation-for="MemberType" class="text-danger"></span>
-    </div>
- 
-    <div>
-        <button type="submit" class="btn btn-primary">Save</button>
-        <a asp-action="Index" class="btn btn-link">Cancel</a>
-    </div>
-</form>
+</div>

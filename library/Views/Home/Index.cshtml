@@ -1,8 +1,145 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="home-landing">
+
+    <!-- HERO -->
+    <section class="landing-hero">
+
+        <div class="landing-content">
+
+            <span class="landing-eyebrow">
+                ✦ WELCOME TO THE LIBRARY
+            </span>
+
+            <h1>
+                A world of stories.
+                <span>One place to discover.</span>
+            </h1>
+
+            <p>
+                Welcome to The Library, your personal space for
+                knowledge, imagination, and discovery.
+                Explore the joy of reading and experience a simpler
+                way to appreciate every story.
+            </p>
+
+            <div class="landing-buttons">
+
+                <a asp-controller="Books"
+                   asp-action="Index"
+                   class="landing-primary">
+                    Explore the Library →
+                </a>
+
+                <a href="#about-library"
+                   class="landing-secondary">
+                    Discover More
+                </a>
+
+            </div>
+
+            <div class="landing-status">
+                <span class="landing-dot"></span>
+                A place where every story matters.
+            </div>
+
+        </div>
+
+        <!-- DECORATIVE ART -->
+        <div class="landing-illustration">
+
+            <div class="landing-orbit orbit-one"></div>
+            <div class="landing-orbit orbit-two"></div>
+
+            <div class="landing-big-book">
+                <div class="book-inner">
+                    <span>THE ART OF</span>
+                    <strong>READING</strong>
+                    <div class="book-star">✦</div>
+                    <small>EVERY STORY BEGINS HERE</small>
+                </div>
+            </div>
+
+            <div class="floating-note note-one">READ</div>
+            <div class="floating-note note-two">DISCOVER</div>
+            <div class="floating-note note-three">IMAGINE</div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ABOUT THE LIBRARY -->
+    <section class="landing-about" id="about-library">
+
+        <div class="landing-about-heading">
+            <span>OUR LITTLE CORNER OF KNOWLEDGE</span>
+
+            <h2>
+                More than just a place for books.
+            </h2>
+
+            <p>
+                Every book holds a different world.
+                Every page brings a new perspective.
+                And every visit is an opportunity to learn something new.
+            </p>
+        </div>
+
+        <div class="landing-values">
+
+            <div class="landing-value">
+                <div class="value-icon">✧</div>
+                <h3>Discover</h3>
+                <p>
+                    Find new ideas, explore different perspectives,
+                    and open your mind to endless possibilities.
+                </p>
+            </div>
+
+            <div class="landing-value">
+                <div class="value-icon">❖</div>
+                <h3>Learn</h3>
+                <p>
+                    Let every page inspire curiosity
+                    and make learning part of everyday life.
+                </p>
+            </div>
+
+            <div class="landing-value">
+                <div class="value-icon">✦</div>
+                <h3>Grow</h3>
+                <p>
+                    Build knowledge, embrace imagination,
+                    and create your own story along the way.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CLOSING BANNER -->
+    <section class="landing-banner">
+
+        <span>THE LIBRARY EXPERIENCE</span>
+
+        <h2>
+            Your next chapter starts here.
+        </h2>
+
+        <p>
+            Open a book. Find inspiration. Discover something wonderful.
+        </p>
+
+        <a asp-controller="Books"
+           asp-action="Index">
+            Start Exploring →
+        </a>
+
+    </section>
+
 </div>
