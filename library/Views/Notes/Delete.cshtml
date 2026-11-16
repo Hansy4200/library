@@ -1,29 +1,37 @@
-﻿@model library.Models.Note
-
+﻿@model Note
 @{
-    ViewData["Title"] = "Delete Note";
+    ViewData["Title"] = "Delete a note";
 }
 
-<div class="container mt-4">
-    <h2>Delete Note</h2>
+<div class="book-form-page">
 
-    <div class="alert alert-warning">
-        Are you sure you want to delete this note? This cannot be undone.
+    <div class="book-form-breadcrumb">
+        <a asp-action="Index">Notes</a>
+        <span>/</span>
+        <span>Delete a note</span>
     </div>
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <p><strong>ID:</strong> @Model.NoteId</p>
-            <p><strong>Title:</strong> @Model.Title</p>
-            <p><strong>Body:</strong> @(Model.Body ?? "No body")</p>
-            <p><strong>Created On:</strong> @Model.CreatedOn.ToString("yyyy-MM-dd")</p>
+    <div class="book-delete-card">
+        <div class="delete-warning-icon">!</div>
+        <h2>Delete this note?</h2>
+        <p class="delete-warning-text">This can't be undone.</p>
+
+        <div class="delete-book-details">
+            <div class="delete-book-cover">📝</div>
+            <div class="delete-book-info">
+                <span>NOTE #@Model.NoteId</span>
+                <h3>@Model.Title</h3>
+                <p>@(string.IsNullOrWhiteSpace(Model.Body) ? "No body" : Model.Body)</p>
+                <p>Created: <strong>@Model.CreatedOn.ToString("yyyy-MM-dd")</strong></p>
+            </div>
         </div>
+
+        <form asp-action="Delete" asp-route-id="@Model.NoteId" method="post">
+            <div asp-validation-summary="ModelOnly" class="book-validation-summary"></div>
+            <div class="book-delete-actions">
+                <a asp-action="Index" class="book-cancel-btn">Cancel</a>
+                <button type="submit" class="book-confirm-delete-btn">Delete note</button>
+            </div>
+        </form>
     </div>
-
-    <form asp-action="Delete" asp-route-id="@Model.NoteId" method="post">
-        @Html.AntiForgeryToken()
-
-        <button type="submit" class="btn btn-danger">Yes, Delete</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-    </form>
 </div>

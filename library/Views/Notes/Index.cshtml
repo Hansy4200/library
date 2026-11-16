@@ -1,57 +1,138 @@
-﻿@model IEnumerable<library.Models.Note>
-
+﻿@model List<Note>
 @{
     ViewData["Title"] = "Library Notes";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2>Library Notes</h2>
-            <p class="text-muted">Manage your library reminders and notes.</p>
-        </div>
+<div class="book-inventory-page">
 
-        <a asp-action="Create" class="btn btn-success">+ Add Note</a>
+    <div class="book-page-header">
+        <div>
+            <span class="book-eyebrow">REMINDERS</span>
+            <h1>Library Notes</h1>
+            <p>Manage your library reminders and notes.</p>
+        </div>
+        <a asp-action="Create" class="book-add-button">+ Add Note</a>
     </div>
 
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info">No notes found.</div>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped align-middle">
-                <thead class="table-success">
-                    <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Body</th>
-                        <th>Created On</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var note in Model)
-                    {
-                        <tr>
-                            <td>@note.NoteId</td>
-                            <td>@note.Title</td>
-                            <td>@(string.IsNullOrWhiteSpace(note.Body) ? "No body" : note.Body)</td>
-                            <td>@note.CreatedOn.ToString("yyyy-MM-dd")</td>
-                            <td>
-                                <a asp-action="Edit"
-                                   asp-route-id="@note.NoteId"
-                                   class="btn btn-primary btn-sm">Edit</a>
-
-                                <a asp-action="Delete"
-                                   asp-route-id="@note.NoteId"
-                                   class="btn btn-danger btn-sm">Delete</a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+    <div class="book-summary">
+        <div class="book-summary-icon">📝</div>
+        <div>
+            <strong>@Model.Count</strong>
+            <span>@(Model.Count == 1 ? "note" : "notes") saved</span>
         </div>
-    }
+    </div>
+
+    <section class="book-table-section">
+
+        <div class="book-table-heading">
+            <div>
+                <h2>All notes</h2>
+                <p>Search by title or body.</p>
+            </div>
+            <span class="book-record-count" id="bookCount">@Model.Count RECORDS</span>
+        </div>
+
+        <div class="book-toolbar">
+            <label class="book-search-box">
+                <span>⌕</span>
+                <input type="text" id="bookSearch" placeholder="Search by title or body" autocomplete="off" />
+            </label>
+            <button type="button" class="book-clear-button" id="bookClear">Clear</button>
+        </div>
+
+        @if (Model.Count == 0)
+        {
+            <div class="book-empty-state">
+                <div>📝</div>
+                <h3>No notes yet</h3>
+                <p>Add a reminder to get started.</p>
+                <a asp-action="Create" class="book-add-button">+ Add Note</a>
+            </div>
+        }
+        else
+        {
+            <div class="book-table-wrapper">
+                <table class="book-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>TITLE</th>
+                            <th>BODY</th>
+                            <th>CREATED ON</th>
+                            <th class="book-actions-heading">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var n in Model)
+                        {
+                            var searchText = $"{n.Title} {n.Body}".ToLowerInvariant();
+                            <tr class="book-row" data-search="@searchText">
+                                <td class="book-id">@n.NoteId</td>
+                                <td>
+                                    <div class="book-title-cell">
+                                        <span class="book-row-icon">📝</span>
+                                        <strong>@n.Title</strong>
+                                    </div>
+                                </td>
+                                <td style="max-width:360px">
+                                    @if (string.IsNullOrWhiteSpace(n.Body))
+                                    {
+                                        <span class="book-id">No body</span>
+                                    }
+                                    else
+                                    {
+                                        @n.Body
+                                    }
+                                </td>
+                                <td style="white-space:nowrap">@n.CreatedOn.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    <div class="book-action-buttons">
+                                        <a asp-action="Edit" asp-route-id="@n.NoteId" class="book-edit-button">✎ Edit</a>
+                                        <a asp-action="Delete" asp-route-id="@n.NoteId" class="book-delete-button">🗑 Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="book-no-results" id="bookNoResults" hidden>
+                    <span>🔍</span>
+                    <h3>No notes found</h3>
+                    <p>Try a different word, or clear the search.</p>
+                </div>
+            </div>
+
+            <div class="book-table-footer">
+                <span>Showing all notes</span>
+                <span>GREENLEAF LIBRARY</span>
+            </div>
+        }
+    </section>
 </div>
+
+<script>
+    (function () {
+        var input = document.getElementById('bookSearch');
+        var clear = document.getElementById('bookClear');
+        var count = document.getElementById('bookCount');
+        var none = document.getElementById('bookNoResults');
+        var rows = Array.prototype.slice.call(document.querySelectorAll('.book-row'));
+        if (!input || !count) return;
+
+        function apply() {
+            var q = input.value.trim().toLowerCase();
+            var shown = 0;
+            rows.forEach(function (r) {
+                var match = !q || r.getAttribute('data-search').indexOf(q) !== -1;
+                r.hidden = !match;
+                if (match) shown++;
+            });
+            count.textContent = q ? shown + ' OF ' + rows.length + ' RECORDS' : rows.length + ' RECORDS';
+            if (none) none.hidden = shown !== 0 || rows.length === 0;
+        }
+
+        input.addEventListener('input', apply);
+        clear.addEventListener('click', function () { input.value = ''; apply(); input.focus(); });
+    })();
+</script>

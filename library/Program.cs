@@ -36,6 +36,10 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable CSS, JavaScript, and image files
+app.UseStaticFiles();
+
 app.UseRouting();
 app.UseAuthorization();
 

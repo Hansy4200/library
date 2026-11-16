@@ -1,66 +1,131 @@
-@model List<library.Models.Member>
-
+@model List<Member>
 @{
     ViewData["Title"] = "Members";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-        <h1 class="mb-0">Members</h1>
-        <p class="text-muted mb-0">@Model.Count members registered</p>
+<div class="book-inventory-page">
+
+    <div class="book-page-header">
+        <div>
+            <span class="book-eyebrow">LIBRARY MEMBERS</span>
+            <h1>Members</h1>
+            <p>Everyone registered with the library.</p>
+        </div>
+        <a asp-action="Create" class="book-add-button">+ Add a member</a>
     </div>
 
-    <a asp-action="Create" class="btn btn-primary">Add a member</a>
+    <div class="book-summary">
+        <div class="book-summary-icon">👥</div>
+        <div>
+            <strong>@Model.Count</strong>
+            <span>members registered</span>
+        </div>
+    </div>
+
+    <section class="book-table-section">
+
+        <div class="book-table-heading">
+            <div>
+                <h2>All members</h2>
+                <p>Search by name, email, or type.</p>
+            </div>
+            <span class="book-record-count" id="bookCount">@Model.Count RECORDS</span>
+        </div>
+
+        <div class="book-toolbar">
+            <label class="book-search-box">
+                <span>⌕</span>
+                <input type="text" id="bookSearch" placeholder="Search by name, email, or type" autocomplete="off" />
+            </label>
+            <button type="button" class="book-clear-button" id="bookClear">Clear</button>
+        </div>
+
+        @if (Model.Count == 0)
+        {
+            <div class="book-empty-state">
+                <div>👥</div>
+                <h3>No members yet</h3>
+                <p>Register the first member to get started.</p>
+                <a asp-action="Create" class="book-add-button">+ Add a member</a>
+            </div>
+        }
+        else
+        {
+            <div class="book-table-wrapper">
+                <table class="book-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>FULL NAME</th>
+                            <th>EMAIL</th>
+                            <th>JOIN DATE</th>
+                            <th>TYPE</th>
+                            <th class="book-actions-heading">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var m in Model)
+                        {
+                            var searchText = $"{m.FullName} {m.Email} {m.MemberType}".ToLowerInvariant();
+                            <tr class="book-row" data-search="@searchText">
+                                <td class="book-id">@m.MemberId</td>
+                                <td>
+                                    <div class="book-title-cell">
+                                        <span class="book-row-icon">👤</span>
+                                        <strong>@m.FullName</strong>
+                                    </div>
+                                </td>
+                                <td>@(m.Email ?? "—")</td>
+                                <td>@m.JoinDate.ToString("yyyy-MM-dd")</td>
+                                <td><span class="book-category-tag">@m.MemberType</span></td>
+                                <td>
+                                    <div class="book-action-buttons">
+                                        <a asp-action="Edit" asp-route-id="@m.MemberId" class="book-edit-button">✎ Edit</a>
+                                        <a asp-action="Delete" asp-route-id="@m.MemberId" class="book-delete-button">🗑 Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="book-no-results" id="bookNoResults" hidden>
+                    <span>🔍</span>
+                    <h3>No members found</h3>
+                    <p>Try a different name, email, or type, or clear the search.</p>
+                </div>
+            </div>
+
+            <div class="book-table-footer">
+                <span>Showing all registered members</span>
+                <span>GREENLEAF LIBRARY</span>
+            </div>
+        }
+    </section>
 </div>
 
-<table class="table table-striped table-hover align-middle">
-    <thead class="table-dark">
-        <tr>
-            <th class="text-end" style="width:4rem">#</th>
-            <th>Full name</th>
-            <th>Email</th>
-            <th>Join date</th>
-            <th>Type</th>
-            <th class="text-end">Books out</th>
-            <th style="width:10rem"></th>
-        </tr>
-    </thead>
+<script>
+    (function () {
+        var input = document.getElementById('bookSearch');
+        var clear = document.getElementById('bookClear');
+        var count = document.getElementById('bookCount');
+        var none = document.getElementById('bookNoResults');
+        var rows = Array.prototype.slice.call(document.querySelectorAll('.book-row'));
+        if (!input || !count) return;
 
-    <tbody>
-        @foreach (var member in Model)
-        {
-            <tr>
-                <td class="text-end">@member.MemberId</td>
-                <td>@member.FullName</td>
-                <td>@(member.Email ?? "—")</td>
-                <td>@member.JoinDate.ToString("yyyy-MM-dd")</td>
-                <td>
-                    <span class="badge text-bg-secondary">
-                        @member.MemberType
-                    </span>
-                </td>
-                <td class="text-end">@member.OpenLoans</td>
-
-                <td class="text-end">
-                    <a asp-action="Edit"
-                       asp-route-id="@member.MemberId"
-                       class="btn btn-sm btn-outline-secondary">
-                        Edit
-                    </a>
-
-                    <a asp-action="Details"
-                       asp-route-id="@member.MemberId"
-                       class="btn btn-sm btn-outline-primary">
-                        Loans
-                    </a>
-
-                    <a asp-action="Delete"
-                       asp-route-id="@member.MemberId"
-                       class="btn btn-sm btn-outline-danger">
-                        Delete
-                    </a>
-                </td>
-            </tr>
+        function apply() {
+            var q = input.value.trim().toLowerCase();
+            var shown = 0;
+            rows.forEach(function (r) {
+                var match = !q || r.getAttribute('data-search').indexOf(q) !== -1;
+                r.hidden = !match;
+                if (match) shown++;
+            });
+            count.textContent = q ? shown + ' OF ' + rows.length + ' RECORDS' : rows.length + ' RECORDS';
+            if (none) none.hidden = shown !== 0 || rows.length === 0;
         }
-    </tbody>
-</table>
+
+        input.addEventListener('input', apply);
+        clear.addEventListener('click', function () { input.value = ''; apply(); input.focus(); });
+    })();
+</script>

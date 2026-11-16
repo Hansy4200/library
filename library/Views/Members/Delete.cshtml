@@ -2,35 +2,39 @@
 @{
     ViewData["Title"] = "Delete a member";
 }
- 
-<h1 class="mb-3">Delete a member</h1>
 
-@if (ViewBag.Error != null)
-{
-    <div class="alert alert-danger">
-        @ViewBag.Error
+<div class="book-form-page">
+
+    <div class="book-form-breadcrumb">
+        <a asp-action="Index">Members</a>
+        <span>/</span>
+        <span>Delete a member</span>
     </div>
-}
- 
-<div class="card card-body" style="max-width:36rem">
- 
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
- 
-    <p>Are you sure you want to delete this member?</p>
-    <dl class="row mb-2">
-        <dt class="col-4">Full name</dt>
-        <dd class="col-8">@Model.FullName</dd>
-        <dt class="col-4">Email</dt>
-        <dd class="col-8">@(Model.Email ?? "—")</dd>
-        <dt class="col-4">Join date</dt>
-        <dd class="col-8">@Model.JoinDate.ToString("yyyy-MM-dd")</dd>
-        <dt class="col-4">Type</dt>
-        <dd class="col-8">@Model.MemberType</dd>
-    </dl>
-    <p class="text-muted small">A member who still has loans cannot be deleted.</p>
- 
-    <form asp-action="Delete" asp-route-id="@Model.MemberId" method="post">
-        <button type="submit" class="btn btn-danger">Delete</button>
-        <a asp-action="Index" class="btn btn-link">Cancel</a>
-    </form>
+
+    <div class="book-delete-card">
+        <div class="delete-warning-icon">!</div>
+        <h2>Delete this member?</h2>
+        <p class="delete-warning-text">
+            This can't be undone. A member who still has loans can't be deleted.
+        </p>
+
+        <div class="delete-book-details">
+            <div class="delete-book-cover">👤</div>
+            <div class="delete-book-info">
+                <span>MEMBER #@Model.MemberId</span>
+                <h3>@Model.FullName</h3>
+                <p>Email: <strong>@(Model.Email ?? "—")</strong></p>
+                <p>Type: <strong>@Model.MemberType</strong></p>
+                <p>Joined: <strong>@Model.JoinDate.ToString("yyyy-MM-dd")</strong></p>
+            </div>
+        </div>
+
+        <form asp-action="Delete" asp-route-id="@Model.MemberId" method="post">
+            <div asp-validation-summary="ModelOnly" class="book-validation-summary"></div>
+            <div class="book-delete-actions">
+                <a asp-action="Index" class="book-cancel-btn">Cancel</a>
+                <button type="submit" class="book-confirm-delete-btn">Delete member</button>
+            </div>
+        </form>
+    </div>
 </div>

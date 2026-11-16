@@ -1,41 +1,139 @@
 ﻿@model List<Book>
 @{
     ViewData["Title"] = "Books";
+    var books = Model.OrderBy(b => b.BookId).ToList();
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-        <h1 class="mb-0">Books</h1>
-        <p class="text-muted mb-0">@Model.Count books in the catalogue</p>
-    </div>
-    <a asp-action="Create" class="btn btn-primary">Add a book</a>
+<div class="book-inventory-page">
 
+    <div class="book-page-header">
+        <div>
+            <span class="book-eyebrow">LIBRARY CATALOGUE</span>
+            <h1>Books</h1>
+            <p>Manage every title in the library.</p>
+        </div>
+        <a asp-action="Create" class="book-add-button">+ Add a book</a>
+    </div>
+
+    <div class="book-summary">
+        <div class="book-summary-icon">📚</div>
+        <div>
+            <strong>@books.Count</strong>
+            <span>@(books.Count == 1 ? "book" : "books") in the catalogue</span>
+        </div>
+    </div>
+
+    <section class="book-table-section">
+
+        <div class="book-table-heading">
+            <div>
+                <h2>All books</h2>
+                <p>Search by title or category.</p>
+            </div>
+            <span class="book-record-count" id="bookCount">@books.Count RECORDS</span>
+        </div>
+
+        <div class="book-toolbar">
+            <label class="book-search-box">
+                <span>⌕</span>
+                <input type="text" id="bookSearch" placeholder="Search by book title or category" autocomplete="off" />
+            </label>
+            <button type="button" class="book-clear-button" id="bookClear">Clear</button>
+        </div>
+
+        @if (books.Count == 0)
+        {
+            <div class="book-empty-state">
+                <div>📖</div>
+                <h3>No books yet</h3>
+                <p>Add the first book to start your catalogue.</p>
+                <a asp-action="Create" class="book-add-button">+ Add a book</a>
+            </div>
+        }
+        else
+        {
+            <div class="book-table-wrapper">
+                <table class="book-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>BOOK TITLE</th>
+                            <th>CATEGORY</th>
+                            <th>PRICE</th>
+                            <th class="book-actions-heading">ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var book in books)
+                        {
+                            var searchText = $"{book.Title} {book.Category}".ToLowerInvariant();
+                            <tr class="book-row" data-search="@searchText">
+                                <td class="book-id">@book.BookId</td>
+                                <td>
+                                    <div class="book-title-cell">
+                                        <span class="book-row-icon">📖</span>
+                                        <strong>@book.Title</strong>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (string.IsNullOrWhiteSpace(book.Category))
+                                    {
+                                        <span class="book-id">—</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="book-category-tag">@book.Category</span>
+                                    }
+                                </td>
+                                <td class="book-price">@(book.Price is null ? "—" : "₱" + book.Price.Value.ToString("N2"))</td>
+                                <td>
+                                    <div class="book-action-buttons">
+                                        <a asp-action="Edit" asp-route-id="@book.BookId" class="book-edit-button">✎ Edit</a>
+                                        <a asp-action="Delete" asp-route-id="@book.BookId" class="book-delete-button">🗑 Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="book-no-results" id="bookNoResults" hidden>
+                    <span>🔍</span>
+                    <h3>No books found</h3>
+                    <p>Try a different title or category, or clear the search.</p>
+                </div>
+            </div>
+
+            <div class="book-table-footer">
+                <span>Showing the full catalogue, sorted by ID</span>
+                <span>GREENLEAF LIBRARY</span>
+            </div>
+        }
+    </section>
 </div>
 
-<table class="table table-striped table-hover align-middle">
-    <thead class="table-dark">
-        <tr>
-            <th class="text-end" style="width:4rem">#</th>
-            <th>Title</th>
-            <th>Category</th>
-            <th class="text-end">Price</th>
-            <th style="width:10rem"></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var book in Model)
-        {
-            <tr>
-                <td class="text-end">@book.BookId</td>
-                <td>@book.Title</td>
-                <td><span class="badge text-bg-secondary">@(book.Category ?? "—")</span></td>
-                <td class="text-end">@(book.Price?.ToString("N2") ?? "—")</td>
-                <td class="text-end">
-                      <a asp-action="Edit" asp-route-id="@book.BookId" class="btn btn-sm btn-outline-secondary">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@book.BookId" class="btn btn-sm btn-outline-danger">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<script>
+    (function () {
+        var input = document.getElementById('bookSearch');
+        var clear = document.getElementById('bookClear');
+        var count = document.getElementById('bookCount');
+        var none = document.getElementById('bookNoResults');
+        var rows = Array.prototype.slice.call(document.querySelectorAll('.book-row'));
+        if (!input || !count) return;
 
+        function apply() {
+            var q = input.value.trim().toLowerCase();
+            var shown = 0;
+            rows.forEach(function (r) {
+                var match = !q || r.getAttribute('data-search').indexOf(q) !== -1;
+                r.hidden = !match;
+                if (match) shown++;
+            });
+            count.textContent = q ? shown + ' OF ' + rows.length + ' RECORDS' : rows.length + ' RECORDS';
+            if (none) none.hidden = shown !== 0 || rows.length === 0;
+        }
+
+        input.addEventListener('input', apply);
+        clear.addEventListener('click', function () { input.value = ''; apply(); input.focus(); });
+    })();
+</script>

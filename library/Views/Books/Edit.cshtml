@@ -2,42 +2,67 @@
 @{
     ViewData["Title"] = "Edit a book";
 }
- 
-<h1 class="mb-3">Edit a book</h1>
- 
-<form asp-action="Edit" method="post" class="card card-body" style="max-width:36rem">
-    <input type="hidden" asp-for="BookId" />
- 
-    <div class="mb-3">
-        <label asp-for="Title" class="form-label"></label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
-    </div>
- 
-    <div class="mb-3">
-        <label asp-for="Category" class="form-label"></label>
-        <select asp-for="Category" class="form-select">
-            <option value="">(none)</option>
-            <option>Classic</option>
-            <option>Fiction</option>
-            <option>Poetry</option>
-            <option>Reference</option>
-            <option>Textbook</option>
-        </select>
-    </div>
- 
-    <div class="mb-3">
-        <label asp-for="Price" class="form-label"></label>
-        <input asp-for="Price" class="form-control" />
-        <span asp-validation-for="Price" class="text-danger"></span>
-    </div>
- 
-    <div>
-        <button type="submit" class="btn btn-primary">Save</button>
-        <a asp-action="Index" class="btn btn-link">Cancel</a>
-    </div>
-</form>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+<div class="book-form-page">
+
+    <div class="book-form-breadcrumb">
+        <a asp-action="Index">Books</a>
+        <span>/</span>
+        <span>Edit a book</span>
+    </div>
+
+    <div class="book-form-heading">
+        <h1>Edit a book</h1>
+        <p>Update this book's details.</p>
+    </div>
+
+    <div class="book-form-card">
+        <div class="book-form-card-heading">
+            <div class="book-form-icon">✎</div>
+            <div>
+                <h2>Book details</h2>
+                <p>Title is required. Category and price are optional.</p>
+            </div>
+        </div>
+
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="BookId" />
+
+            <div asp-validation-summary="ModelOnly" class="book-validation-summary"></div>
+
+            <div class="book-form-fields">
+                <div class="book-form-group">
+                    <label asp-for="Title">Book title</label>
+                    <input asp-for="Title" class="book-form-input" placeholder="e.g. Noli Me Tangere" />
+                    <span asp-validation-for="Title" class="book-validation-message"></span>
+                </div>
+
+                <div class="book-form-group">
+                    <label asp-for="Category">Category</label>
+                    <select asp-for="Category" class="book-form-input">
+                        <option value="">(none)</option>
+                        <option>Classic</option>
+                        <option>Fiction</option>
+                        <option>Poetry</option>
+                        <option>Reference</option>
+                        <option>Textbook</option>
+                    </select>
+                </div>
+
+                <div class="book-form-group">
+                    <label asp-for="Price">Price</label>
+                    <div class="book-price-input">
+                        <span>₱</span>
+                        <input asp-for="Price" class="book-form-input" placeholder="0.00" />
+                    </div>
+                    <span asp-validation-for="Price" class="book-validation-message"></span>
+                </div>
+            </div>
+
+            <div class="book-form-actions">
+                <a asp-action="Index" class="book-cancel-btn">Cancel</a>
+                <button type="submit" class="book-save-btn">Save book</button>
+            </div>
+        </form>
+    </div>
+</div>
